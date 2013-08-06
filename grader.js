@@ -69,30 +69,29 @@ var clone = function(fn) {
 
 //--- My "own" code starts here --
 
-var checkurl = function (url) {
+/*var checkurl = function (url) {
   var instr = url.toString();
   generalbuffer = new Buffer(requestURL(instr), 'utf8');
-}
+}*/
 
-var requestURL = function(url) {    
+var requestURL = function(url, checksfile) {    
   rest.get(url).on('complete', function(result, response) {
     if (result instanceof Error) {
-        console.log("Cannot load URL %s", instr);
+        console.log("Cannot load URL %s", url);
         process.exit(1);
     } 
     else {
-      return result;
+      console.log("Processing URL %s", url);
+      return processURL(result, checksfile);
     }
   });
 };
 
-var checkRemoteFile = function(remotefile, checksfile) {
-    var general = generalbuffer.toString('utf8');
-    console.log("the URL result we will work on is\n%s", general);
+var processURL = function(remotefile, checksfile) {
     var checks = loadChecks(checksfile).sort();
     var out = {};
     for(var ii in checks) {
-        var present = general(checks[ii]).length > 0;
+        var present = remotefile(checks[ii]).length > 0;
         out[checks[ii]] = present;
     }
     return out;
@@ -103,23 +102,20 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to file to check', clone(assertFileExists), HTMLFILE_DEFAULT)
-        .option('-u, --url <url_to_check>', 'URL path to file to check', checkurl, URLFILE_DEFAULT)
+        .option('-u, --url <url_to_check>', 'URL path to file to check', URLFILE_DEFAULT)
         .parse(process.argv);
-    //if (!program.file && !program.url) {console.log("Cannot define file and URL in the same time. Exiting.");
-    //process.exit(1);}
-    /*
+    
     if (program.file){
       console.log("checking file");  
       checkJson = checkHtmlFile(program.file, program.checks)
     }
-    */
     if (program.url){
       console.log("checking URL");
-      checkJson = checkRemoteFile(program.url, program.checks)};
+      checkJson = requestURL(program.url, program.checks)};
 var outJson = JSON.stringify(checkJson, null, 4);
 console.log(outJson);
 } 
 else {
     exports.checkHtmlFile = checkHtmlFile;
+    exports.requestURL = requestURL;
 }
-
