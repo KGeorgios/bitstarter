@@ -29,7 +29,6 @@ var rest = require('restler');
 
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
-var URLFILE_DEFAULT = "http://127.0.0.1:5000";
 
 var assertFileExists = function(infile) {
     var instr = infile.toString();
@@ -85,21 +84,24 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', assertFileExists, CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to file to check', assertFileExists, HTMLFILE_DEFAULT)
-        .option('-u, --url <url_to_check>', 'URL path to file to check', URLFILE_DEFAULT)
+        .option('-u, --url <url_to_check>', 'URL path to file to check')
         .parse(process.argv);
     
-    if (program.file){
-      console.log("checking file");  
+    // Default values turn program.file always true
+
+    if (program.url){
+      console.log("Checking URL: ", program.url);
+      call_url(program.url, program.checks);
+      console.log("Waiting while we retrieve URL...\n\n");      
+    }
+
+    else {
+      console.log("Checking file: ", program.file);  
       checkJson = checkHtmlFile(program.file, program.checks, 0)
       var outJson = JSON.stringify(checkJson, null, 4);
       console.log(outJson);
     }
-    if (program.url){
-      console.log("checking URL");
-      call_url(program.url, program.checks)};
-      console.log("POINT X");      
-
-} 
+}     
 else {
     exports.checkHtmlFile = checkHtmlFile;
     exports.call_url = call_url;
