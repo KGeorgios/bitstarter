@@ -90,13 +90,13 @@ if(require.main == module) {
     // Default values turn program.file always true
 
     if (program.url){
-      console.log("Checking URL: ", program.url);
+      //console.log("Checking URL: ", program.url);
       call_url(program.url, program.checks);
-      console.log("Waiting while we retrieve URL...\n\n");      
+      //console.log("Waiting while we retrieve URL...\n\n");      
     }
 
     else {
-      console.log("Checking file: ", program.file);  
+      //console.log("Checking file: ", program.file);  
       checkJson = checkHtmlFile(program.file, program.checks, 0)
       var outJson = JSON.stringify(checkJson, null, 4);
       console.log(outJson);
